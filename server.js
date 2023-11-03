@@ -31,6 +31,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use('/api', [RegisterRoute, TestData]);
 
+app.get('/', (req, res) => {
+
+    console.log('test');
+    res.send('Hello!');
+});
+
 app.get('/test', (req, res) => {
     console.log('test');
     res.send('Hello!');
