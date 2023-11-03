@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
-mongoose.connect('mongodb+srv://nodejsdatabase:9wfmXiEOjHBnA9oZ@cluster0.eakp9te.mongodb.net/test'); // 9wfmXiEOjHBnA9oZ
+mongoose.connect(process.env.DATABASE_URI);
 const db = mongoose.connection;
 const RegisterRoute = require('./routes/auth');
 const TestData = require('./routes/data');
