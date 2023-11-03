@@ -11,24 +11,35 @@ const register = async (req, res) => {
             })
         }
         const userId = await createUniqueID();
-        let user = new User({
-            name: req.body.name,
-            phone: req.body.phone,
-            userId: userId,
-            password: hashedPass
+        User.find({
+            phone: req.body.phone
+        }).exec().then(user => {
+            if (user.length >= 1) {
+                return res.status(409).json({
+                    message: "Phone number already exists"
+                });
+            } else {
+                let user = new User({
+                    name: req.body.name,
+                    phone: req.body.phone,
+                    refCode: req.body.refCode,
+                    userId: userId,
+                    password: hashedPass
+                })
+                let coffee = new CoffeeCredits({
+                    userId: user.userId
+                })
+                try {
+                    const savedUser = user.save();
+                    coffee.save();
+                    res.json(savedUser);
+                } catch (err) {
+                    res.json({
+                        message: err
+                    })
+                }
+            }
         })
-        let coffee = new CoffeeCredits({
-            userId: user.userId
-        })
-        try {
-            const savedUser = await user.save();
-            await coffee.save();
-            res.json(savedUser);
-        } catch (err) {
-            res.json({
-                message: err
-            })
-        }
     })
 }
 

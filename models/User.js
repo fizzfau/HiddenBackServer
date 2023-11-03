@@ -6,6 +6,7 @@ const UserSchema = Schema({
     phone: String,
     password: String,
     userId: String,
+    refCode: String,
     date: { type: Date, default: Date.now }
 });
 
