@@ -3,7 +3,7 @@ const router = express.Router();
 const CoffeeCredits = require('../models/CoffeeCredits');
 const authenticate = require('../middleware/authenticate');
 
-router.get('/incrementCredit', (req, res) => {
+router.post('/incrementCredit', (req, res) => {
     console.log(7, req.body);
     CoffeeCredits.findOne({userId: req.body.id})
     .exec()

@@ -7,8 +7,8 @@ const morgan = require('morgan');
 mongoose.connect(process.env.DATABASE_URI);
 const db = mongoose.connection;
 const RegisterRoute = require('./routes/auth');
-
 const GetData = require('./routes/data');
+const Increment = require('./routes/increment');
 
 db.on('error', (err) => {
     console.log(`Database error: ${err}`);
@@ -29,7 +29,7 @@ app.use(morgan('dev'));
 
 const PORT = process.env.PORT || 3000;
 
-app.use('/api', [RegisterRoute, GetData]);
+app.use('/api', [RegisterRoute, GetData, Increment]);
 
 app.get('/', (req, res) => {
 
