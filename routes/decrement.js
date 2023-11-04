@@ -3,11 +3,12 @@ const router = express.Router();
 const CoffeeCredits = require('../models/CoffeeCredits');
 const authenticate = require('../middleware/authenticate');
 
-router.get('/decrementCoffee', (req, res) => {
+router.post('/decrementCoffee', (req, res) => {
     CoffeeCredits.findOne({userId: req.body.id})
     .exec()
     .then(user => {
         req.body.credits = parseInt(req.body.credits);
+        console.log(31, user.credits, req.body.credits);
         if (user.coffee - req.body.credits >= 0) {
             user.coffee -= 1;
         } else {
@@ -19,7 +20,7 @@ router.get('/decrementCoffee', (req, res) => {
         res.status(200).json({})
     })
     .catch(err => {
-        res.json({
+        res.status(401).json({
             message: err
         })
     })
