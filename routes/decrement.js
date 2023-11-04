@@ -8,9 +8,8 @@ router.post('/decrementCoffee', (req, res) => {
     .exec()
     .then(user => {
         req.body.credits = parseInt(req.body.credits);
-        console.log(31, user.credits, req.body.credits);
         if (user.coffee - req.body.credits >= 0) {
-            user.coffee -= 1;
+            user.coffee -= req.body.credits;
         } else {
             res.status(401).json({
                 message: "Not enough coffee"
