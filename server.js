@@ -10,6 +10,7 @@ const RegisterRoute = require('./routes/auth');
 const GetData = require('./routes/data');
 const Increment = require('./routes/increment');
 const Decrement = require('./routes/decrement');
+const Delete = require('./routes/deleteAccount');
 
 db.on('error', (err) => {
     console.log(`Database error: ${err}`);
@@ -30,7 +31,7 @@ app.use(morgan('dev'));
 
 const PORT = process.env.PORT || 3000;
 
-app.use('/api', [RegisterRoute, GetData, Increment, Decrement]);
+app.use('/api', [RegisterRoute, GetData, Increment, Decrement, Delete]);
 
 app.get('/', (req, res) => {
 
