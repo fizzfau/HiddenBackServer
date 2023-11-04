@@ -9,6 +9,7 @@ const db = mongoose.connection;
 const RegisterRoute = require('./routes/auth');
 const GetData = require('./routes/data');
 const Increment = require('./routes/increment');
+const Decrement = require('./routes/decrement');
 
 db.on('error', (err) => {
     console.log(`Database error: ${err}`);
@@ -29,7 +30,7 @@ app.use(morgan('dev'));
 
 const PORT = process.env.PORT || 3000;
 
-app.use('/api', [RegisterRoute, GetData, Increment]);
+app.use('/api', [RegisterRoute, GetData, Increment, Decrement]);
 
 app.get('/', (req, res) => {
 

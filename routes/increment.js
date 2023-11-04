@@ -10,21 +10,17 @@ router.post('/incrementCredit', (req, res) => {
     .then(user => {
         req.body.credits = parseInt(req.body.credits);
         user.credits += req.body.credits;
-        console.log(11, user.credits, req.body.credits);
+        console.log(31, user.credits, req.body.credits);
         if (user.credits >= 10) {
             console.log(14)
             user.coffee += 1;
             user.credits = 0;
         }
         user.save();
-        res.status(200).json({
-            credits: user.credits,
-            coffee: user.coffee,
-            name: req.user.name,
-            userId: req.user.userId
-        })
+        res.status(200).json({})
     })
     .catch(err => {
+        console.log(41, err);
         res.status(401).json({
             message: err
         })
