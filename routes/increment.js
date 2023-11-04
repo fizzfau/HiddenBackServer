@@ -4,7 +4,7 @@ const CoffeeCredits = require('../models/CoffeeCredits');
 const authenticate = require('../middleware/authenticate');
 
 router.get('/incrementCredit', (req, res) => {
-    console.log(req.body);
+    console.log(7, req.body);
     CoffeeCredits.findOne({userId: req.body.id})
     .exec()
     .then(user => {
