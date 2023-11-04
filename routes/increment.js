@@ -3,10 +3,17 @@ const router = express.Router();
 const CoffeeCredits = require('../models/CoffeeCredits');
 const authenticate = require('../middleware/authenticate');
 
-router.get('/getCoffeeData', authenticate, (req, res) => {
-    CoffeeCredits.findOne({userId: req.user.userId})
+router.get('/incrementCredit', (req, res) => {
+    console.log(req.body);
+    CoffeeCredits.findOne({userId: req.body.id})
     .exec()
     .then(user => {
+        user.credits += req.body.credits;
+        if (user.credits >= 10) {
+            user.coffee += 1;
+            user.credits = 0;
+        }
+        user.save();
         res.json({
             credits: user.credits,
             coffee: user.coffee,

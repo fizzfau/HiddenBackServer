@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -6,7 +7,8 @@ const morgan = require('morgan');
 mongoose.connect(process.env.DATABASE_URI);
 const db = mongoose.connection;
 const RegisterRoute = require('./routes/auth');
-const TestData = require('./routes/data');
+
+const GetData = require('./routes/data');
 
 db.on('error', (err) => {
     console.log(`Database error: ${err}`);
@@ -27,9 +29,7 @@ app.use(morgan('dev'));
 
 const PORT = process.env.PORT || 3000;
 
-
-
-app.use('/api', [RegisterRoute, TestData]);
+app.use('/api', [RegisterRoute, GetData]);
 
 app.get('/', (req, res) => {
 
