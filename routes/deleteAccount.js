@@ -5,26 +5,22 @@ const User = require('../models/User');
 const authenticate = require('../middleware/authenticate');
 
 router.post('/deleteAccount', authenticate, (req, res) => {
-    CoffeeCredits.findOne({userId: req.user.userId})
+    CoffeeCredits.findOneAndDelete({userId: req.user.userId})
     .exec()
     .then(user => {
-        user.remove();
-    })
-    .catch(err => {
-        res.json({
-            message: err
+        User.findOneAndDelete({userId: req.user.userId})
+        .exec()
+        .then(user => {
+            res.status(200).json({})
         })
-    })
-    User.findOne({_id: req.user.userId})
-    .exec()
-    .then(user => {
-        user.remove();
-        res.json({
-            message: "Account deleted"
+        .catch(err => {
+            res.status(401).json({
+                message: err
+            })
         })
     })
     .catch(err => {
-        res.json({
+        res.status(401).json({
             message: err
         })
     })
