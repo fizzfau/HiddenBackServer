@@ -5,6 +5,7 @@ const User = require('../models/User');
 const authenticate = require('../middleware/authenticate');
 
 router.post('/deleteAccount', authenticate, (req, res) => {
+    console.log(7, req.user.userId);
     CoffeeCredits.findOneAndDelete({userId: req.user.userId})
     .exec()
     .then(user => {
@@ -20,6 +21,7 @@ router.post('/deleteAccount', authenticate, (req, res) => {
         })
     })
     .catch(err => {
+        console.log(41, err);
         res.status(401).json({
             message: err
         })
