@@ -3,11 +3,11 @@ const Schema = mongoose.Schema;
 
 const UserSchema = Schema({
     name: String,
-    phone: String,
+    plate: String,
     password: String,
     userId: String,
-    refCode: String,
+    coopId: String,
     date: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('drivers', UserSchema);

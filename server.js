@@ -7,10 +7,15 @@ const morgan = require('morgan');
 mongoose.connect(process.env.DATABASE_URI);
 const db = mongoose.connection;
 const RegisterRoute = require('./routes/auth');
-const GetData = require('./routes/data');
-const Increment = require('./routes/increment');
-const Decrement = require('./routes/decrement');
 const Delete = require('./routes/deleteAccount');
+const GetDriverData = require('./routes/drivers/getDriverData');
+
+const Routes = [
+    RegisterRoute,
+    Delete,
+    GetDriverData
+];
+
 
 db.on('error', (err) => {
     console.log(`Database error: ${err}`);
@@ -31,7 +36,7 @@ app.use(morgan('dev'));
 
 const PORT = process.env.PORT || 3000;
 
-app.use('/api', [RegisterRoute, GetData, Increment, Decrement, Delete]);
+app.use('/api', Routes);
 
 app.get('/', (req, res) => {
     console.log('test');

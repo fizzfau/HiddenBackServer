@@ -1,5 +1,4 @@
 const User = require('../models/User');
-const CoffeeCredits = require('../models/CoffeeCredits');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -12,7 +11,7 @@ const register = async (req, res) => {
         }
         const userId = await createUniqueID();
         User.find({
-            phone: req.body.phone
+            plate: req.body.plate
         }).exec().then(user => {
             if (user.length >= 1) {
                 return res.status(409).json({
@@ -21,17 +20,13 @@ const register = async (req, res) => {
             } else {
                 let user = new User({
                     name: req.body.name,
-                    phone: req.body.phone,
-                    refCode: req.body.refCode,
+                    plate: req.body.plate,
+                    coopId: req.body.coopId,
                     userId: userId,
                     password: hashedPass
                 })
-                let coffee = new CoffeeCredits({
-                    userId: user.userId
-                })
                 try {
                     const savedUser = user.save();
-                    coffee.save();
                     res.json(savedUser);
                 } catch (err) {
                     res.json({
@@ -44,11 +39,10 @@ const register = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    const username = req.body.username.toString();
+    const plate = req.body.plate.toString();
     const password = req.body.password;
-    console.log(38, username, password);
     User.find({
-            phone: username
+            plate: plate
         })
         .exec()
         .then(user => {
@@ -66,7 +60,8 @@ const login = async (req, res) => {
                 if (result) {
                     const token = jwt.sign({
                             name: user[0].name,
-                            userId: user[0].userId
+                            userId: user[0].userId,
+                            plate: user[0].plate,
                         },
                         "secret", {
                             expiresIn: "99y"
@@ -74,7 +69,7 @@ const login = async (req, res) => {
                     );
                     return res.status(200).json({
                         message: "Authentication successful",
-                        token: token
+                        token: token,
                     });
                 } else {
                     return res.status(401).json({
