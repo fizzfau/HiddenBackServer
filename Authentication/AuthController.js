@@ -62,6 +62,7 @@ const login = async (req, res) => {
                             name: user[0].name,
                             userId: user[0].userId,
                             plate: user[0].plate,
+                            coopId: user[0].coopId
                         },
                         "secret", {
                             expiresIn: "99y"

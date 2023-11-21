@@ -8,6 +8,6 @@ const JobSchema = Schema({
     job_driver_id: String,
     job_listType: String,
     job_listStatus: String,
-});
+}, { collection: 'jobs' });
 
 module.exports = mongoose.model('jobs', JobSchema);
