@@ -39,6 +39,5 @@ const PORT = process.env.PORT || 3000;
 app.use('/api', Routes);
 
 app.get('/', (req, res) => {
-    console.log('test');
     res.send('Hello!');
 });
