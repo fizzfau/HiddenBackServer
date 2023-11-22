@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
 
 const register = async (req, res) => {
     bcrypt.hash(req.body.password, 10, async (err, hashedPass) => {
@@ -64,7 +65,7 @@ const login = async (req, res) => {
                             plate: user[0].plate,
                             coopId: user[0].coopId
                         },
-                        "secret", {
+                        process.env.SECRET, {
                             expiresIn: "99y"
                         }
                     );
