@@ -7,6 +7,9 @@ const UserSchema = Schema({
     password: String,
     userId: String,
     coopId: String,
+    lastClaimedJob: String,
+    lastClaimedDate: Date,
+    lastEntered: { type: Date, default: Date.now },
     date: { type: Date, default: Date.now }
 });
 

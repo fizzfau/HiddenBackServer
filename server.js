@@ -12,15 +12,15 @@ const RegisterRoute = require('./routes/auth');
 const Delete = require('./routes/deleteAccount');
 const GetDriverData = require('./routes/drivers/getDriverData');
 const GetJobs = require('./routes/drivers/getJobs');
-const GetQueue = require('./modules/socket/getDriverQueue');
 const AdminRoutes = require('./routes/admin/adminRoutes');
+const TakeJob = require('./routes/drivers/takeJob');
 
 const Routes = [
     RegisterRoute,
     Delete,
     GetDriverData,
     GetJobs,
-    
+    TakeJob
 ];
 
 
@@ -47,7 +47,6 @@ app.use(morgan('dev'));
 const PORT = process.env.PORT || 3000;
 
 
-
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -64,4 +63,20 @@ app.get('/', (req, res) => {
     const { GetDrivers } = require('./modules/socket/activeDrivers');
     console.log(GetDrivers("12345"));
     res.json(GetDrivers("12345"));
+});
+
+app.post("/createAdmin", function(req, res) {
+    console.log(30, req.body);
+    // const password = req.params.password;
+    // const hashedPassword = bcrypt.hashSync(password, 8);
+    // const userName = req.params.userName;
+    // User.create({
+    //     coopId: req.params.coopId,
+    //     password: hashedPassword,
+    //     userName
+    // })
+    // .then(user => {
+    //     res.status(200).send({ auth: true });
+    // })
+    res.status(200).send({ auth: true });
 });

@@ -8,12 +8,11 @@ router.get('/getDriverData', authenticate, (req, res) => {
     User.findOne({userId: req.user.userId})
     .exec()
     .then(user => {
-        Jobs.find({job_driver_id: req.user.userId})
+        console.log(11, user, typeof user.userId)
+        Jobs.find({job_driver_id: user.userId})
         .exec()
         .then(jobs => {
-            console.log(JSON.parse(jobs[1].job_details).startLocation)
-            
-            res.json({
+            res.status(200).json({
                 name: user.name,
                 plate: user.plate,
                 userId: user.userId,
