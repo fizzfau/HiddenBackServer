@@ -9,7 +9,13 @@ function SocketModule(server) {
     // StartQueue(io)
 
 
+    io.on("connecting", (socket) => {
+        console.log('a user tryin to connect');
+    })
+
     io.on('connection', (socket) => {
+        console.log('a user connected');
+
         const { token } = socket.handshake.query;
         const coopId = jwt.verify(token, process.env.SECRET).coopId;
         const userId = jwt.verify(token, process.env.SECRET).userId;
