@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cooperativechema = new mongoose.Schema({
     cooperativeId: String,
     stats: String,
-    coopDriverOrder: String,
+    coopDriverQueue: String,
     name: String,
 });
 

@@ -13,14 +13,14 @@ const Delete = require('./routes/deleteAccount');
 const GetDriverData = require('./routes/drivers/getDriverData');
 const GetJobs = require('./routes/drivers/getJobs');
 const AdminRoutes = require('./routes/admin/adminRoutes');
-const TakeJob = require('./routes/drivers/takeJob');
+const Queue = require('./modules/socket/getDriverQueue');
 
 const Routes = [
     RegisterRoute,
     Delete,
     GetDriverData,
     GetJobs,
-    TakeJob
+    Queue
 ];
 
 

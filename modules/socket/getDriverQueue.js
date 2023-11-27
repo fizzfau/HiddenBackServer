@@ -1,169 +1,113 @@
-const queue = [
-    {
-        name: 'driver1',
-        plate: 'plate1',
-        status: 'available',
+const Cooperative = require('../../models/Cooperative');
+const Jobs = require('../../models/Jobs');
+const User = require('../../models/User');
 
-    },
-    {
-        name: 'driver2',
-        plate: 'plate2',
-        status: 'available',
+let queue = [];
 
-    },
-    {
-        name: 'driver3',
-        plate: 'plate3',
-        status: 'available',
-
-    },
-    {
-        name: 'driver4',
-        plate: 'plate4',
-        status: 'available',
-
-    },
-    {
-        name: 'driver5',
-        plate: 'plate5',
-        status: 'available',
-
-    },
-    {
-        name: 'driver6',
-        plate: 'plate6',
-        status: 'available',
-
-    },
-    {
-        name: 'driver7',
-        plate: 'plate7',
-        status: 'available',
-
-    },
-    {
-        name: 'driver8',
-        plate: 'plate8',
-        status: 'available',
-
-    },
-    {
-        name: 'driver9',
-        plate: 'plate9',
-        status: 'available',
-
-    },
-    {
-        name: 'driver10',
-        plate: 'plate10',
-        status: 'available',
-
-    },
-    {
-        name: 'driver11',
-        plate: 'plate11',
-        status: 'available',
-
-    },
-    {
-        name: 'driver12',
-        plate: 'plate12',
-        status: 'available',
-
-    },
-    {
-        name: 'driver13',
-        plate: 'plate13',
-        status: 'available',
-
-    },
-    {
-        name: 'driver14',
-        plate: 'plate14',
-        status: 'available',
-
-    },
-    {
-        name: 'driver15',
-        plate: 'plate15',
-        status: 'available',
-
-    },
-    {
-        name: 'driver16',
-        plate: 'plate16',
-        status: 'available',
-
-    },
-    {
-        name: 'driver17',
-        plate: 'plate17',
-        status: 'available',
-
-    },
-    {
-        name: 'driver18',
-        plate: 'plate18',
-        status: 'available',
-
-    },
-    {
-        name: 'driver19',
-        plate: 'plate19',
-        status: 'available',
-
-    },
-    {
-        name: 'driver20',
-        plate: 'plate20',
-        status: 'available',
-
-    },
-    {
-        name: 'driver21',
-        plate: 'plate21',
-        status: 'available',
-
-    },
-]
+Cooperative.findOne({cooperativeId: "12345"}).exec().then(cooperative => {
+    queue = JSON.parse(cooperative.coopDriverQueue);
+    currentUser = queue[3];
+    StartQueue();
+});
 
 const express = require('express');
 const router = express.Router();
+const authenticate = require('../../middleware/authenticate');
+let queueIndex = 98;
 let currentUser = null;
 
 function StartQueue(io) {
-    console.log("Sıra başlatılıyor")
     setInterval(() => {
         console.log("Sıra kontrol ediliyor")
         if (queue.length > 0) {
-            // Eğer sıradaki kişi sıra içinde herhangi bir etkileşimde bulunmamışsa, sıradan çıkar
-            console.log(`Sıradaki kişi:`, JSON.stringify(currentUser));
             if (currentUser !== null) {
-                queue.push(currentUser);
-                currentUser = null;
+                queueIndex++;
+                if (queueIndex >= queue.length) {
+                    queueIndex = 98;
+                }
             }
-    
-            // Sıradaki kişiyi al
-            currentUser = queue.shift();
-            console.log(`Sırada şuan sıradaki kişi: ${currentUser.name}`);
-            console.log(`Bir sonraki kişi:`, queue[0].name);
-            console.log(`Sıradan son çıkan kişi:`, queue[queue.length - 1].name);
-            io.emit('queueChanged', currentUser);
+            currentUser = queue[queueIndex];
+            console.log("Sıradaki kişi: ", currentUser);
         }
-    }, 5000);
+    }, 10000);
 }
 
 // Etkileşimde bulunma endpoint'i
-router.post('/interact/:userId', (req, res) => {
-    const userId = parseInt(req.params.userId);
-
-    // Sıradaki kişi mi kontrol et
-    if (currentUser === userId) {
-        currentUser = null; // Etkileşimde bulunulduğunda sıradan çıkar
-        res.send(`Etkileşimde bulunan kullanıcı: ${userId}`);
+router.post('/takeJob', authenticate, (req, res) => {
+    const plate = req.user.plate;
+    if (currentUser.plate == plate) {
+        takeJob(req, res);
     } else {
-        res.send(`Sıradaki kullanıcı değilsiniz.`);
+        res.status(200).json({
+            success: false,
+            message: 'Sıradaki kullanıcı değilsiniz.!',
+        })
     }
 });
 
-module.exports = {router, currentUser, StartQueue};
+function takeJob(req, res) {
+    const id = req.body.id;
+    const driverId = req.user.userId;
+
+    Jobs.findOne({
+        job_id: id,
+        job_coop_id: req.user.coopId,
+    })
+        .exec()
+        .then(job => {
+            if (!job) {
+                return res.status(200).json({
+                    success: false,
+                    message: 'Böyle bir iş bulunamadı!'
+                })
+            }
+            if (job.job_listStatus === 'claimed') {
+                return res.status(200).json({
+                    success: false,
+                    message: 'Bu iş zaten alınmış!'
+                })
+            }
+
+            job.job_listStatus = 'claimed';
+            job.job_driver_id = driverId;
+            job.claimedAt = Date.now();
+
+            job.save();
+
+            User.findOneAndUpdate({
+                userId: driverId
+            }, {
+                lastClaimedJob: id,
+                lastClaimedDate: Date.now()
+            }).exec()
+            
+            queue.push(currentUser);
+            queue.splice(queueIndex, 1);
+
+            Cooperative.findOneAndUpdate({
+                cooperativeId: req.user.coopId
+            }, {
+                coopDriverQueue: JSON.stringify(queue)
+            }).exec()
+
+            res.status(200).json({
+                success: true,
+                message: 'İşi aldın!',
+            })
+        })
+        .catch(err => {
+            res.json({
+                message: err
+            })
+        })
+}
+
+router.get('/queue', (req, res) => {
+    res.send(queue);
+});
+
+router.get('/getCurrentQueue', (req, res) => {
+    res.send(currentUser);
+});
+
+module.exports = router;

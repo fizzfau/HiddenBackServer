@@ -5,7 +5,7 @@ function SocketModule(server) {
     const { IncrementDriver, DecrementDriver } = require('./activeDrivers');
     const jwt = require('jsonwebtoken');
     const User = require('../../models/User');
-    // const StartQueue = require('./getDriverQueue');
+    const StartQueue = require('./getDriverQueue');
     // StartQueue(io)
 
 
@@ -25,9 +25,6 @@ function SocketModule(server) {
             DecrementDriver(coopId);
             User.findOneAndUpdate({ userId }, { $set: { lastEntered: Date.now() } }).exec()
         });
-
-
-        
     });
 }
 
