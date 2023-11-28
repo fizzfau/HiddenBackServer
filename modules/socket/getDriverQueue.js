@@ -6,14 +6,14 @@ let queue = [];
 
 Cooperative.findOne({cooperativeId: "12345"}).exec().then(cooperative => {
     queue = JSON.parse(cooperative.coopDriverQueue);
-    currentUser = queue[3];
+    currentUser = queue[0];
     StartQueue();
 });
 
 const express = require('express');
 const router = express.Router();
 const authenticate = require('../../middleware/authenticate');
-let queueIndex = 98;
+let queueIndex = 0;
 let currentUser = null;
 
 function StartQueue(io) {
@@ -23,7 +23,7 @@ function StartQueue(io) {
             if (currentUser !== null) {
                 queueIndex++;
                 if (queueIndex >= queue.length) {
-                    queueIndex = 98;
+                    queueIndex = 0;
                 }
             }
             currentUser = queue[queueIndex];
