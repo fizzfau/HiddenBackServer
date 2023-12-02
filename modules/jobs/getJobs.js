@@ -4,6 +4,7 @@ const Jobs = require('../../models/Jobs');
 const authenticate = require('../../middleware/authenticate');
 
 router.get('/getJobList', authenticate, (req, res) => {
+    console.log(req.user.coopId)
     Jobs.find({
             job_coop_id: req.user.coopId,
             job_listStatus: req.body.job_listStatus || "active"

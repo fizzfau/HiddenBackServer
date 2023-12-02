@@ -1,6 +1,7 @@
 const Cooperative = require('../../models/Cooperative');
 const Jobs = require('../../models/Jobs');
 const User = require('../../models/User');
+const { socket, getIo } = require('./connect');
 
 let queue = [];
 
@@ -16,9 +17,9 @@ const authenticate = require('../../middleware/authenticate');
 let queueIndex = 0;
 let currentUser = null;
 
-function StartQueue(io) {
+function StartQueue() {
+    const io = getIo()
     setInterval(() => {
-        console.log("Sıra kontrol ediliyor")
         if (queue.length > 0) {
             if (currentUser !== null) {
                 queueIndex++;
@@ -27,9 +28,11 @@ function StartQueue(io) {
                 }
             }
             currentUser = queue[queueIndex];
-            console.log("Sıradaki kişi: ", currentUser);
+            if (io) {
+                io.emit('queueInfo', currentUser);
+            }
         }
-    }, 10000);
+    }, 30000);
 }
 
 // Etkileşimde bulunma endpoint'i

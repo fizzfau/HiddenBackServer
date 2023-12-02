@@ -13,10 +13,6 @@ router.get('/getDriverData', authenticate, (req, res) => {
         .exec()
         .then(jobs => {
             res.status(200).json({
-                name: user.name,
-                plate: user.plate,
-                userId: user.userId,
-                coopId: user.coopId,
                 jobs: jobs
             })
         })

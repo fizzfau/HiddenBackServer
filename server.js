@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const SocketModule = require('./modules/socket/connect');
+const {SocketModule} = require('./modules/socket/connect');
 const cors = require('cors');
 
 mongoose.connect(process.env.DATABASE_URI);
@@ -11,10 +11,11 @@ const db = mongoose.connection;
 const RegisterRoute = require('./routes/auth');
 const Delete = require('./routes/deleteAccount');
 const GetDriverData = require('./routes/drivers/getDriverData');
-const GetJobs = require('./routes/drivers/getJobs');
+const GetJobs = require('./modules/jobs/getJobs');
 const AdminRoutes = require('./routes/admin/adminRoutes');
 const Queue = require('./modules/socket/getDriverQueue');
-const resetJobs = require('./routes/drivers/resetJobs');
+const resetJobs = require('./modules/jobs/resetJobs');
+const createJob = require('./modules/jobs/createJob');
 
 const Routes = [
     RegisterRoute,
@@ -22,7 +23,7 @@ const Routes = [
     GetDriverData,
     GetJobs,
     Queue,
-    resetJobs
+    resetJobs,
 ];
 
 

@@ -42,6 +42,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     const plate = req.body.plate.toString();
     const password = req.body.password;
+    console.log(45, plate, password)
     User.find({
             plate: plate
         })
@@ -69,9 +70,16 @@ const login = async (req, res) => {
                             expiresIn: "99y"
                         }
                     );
+                    console.log(71, user)
                     return res.status(200).json({
                         message: "Authentication successful",
                         token: token,
+                        user: {
+                            name: user[0].name,
+                            userId: user[0].userId,
+                            plate: user[0].plate,
+                            coopId: user[0].coopId
+                        },
                     });
                 } else {
                     return res.status(401).json({
