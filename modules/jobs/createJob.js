@@ -12,8 +12,8 @@ router.post('/createJob', authenticate, (req, res) => {
     if (isAdmin) {
         const job_details = JSON.stringify(req.body);
         const job_coop_id = coopId;
-        const job_listType = "active";
-        const job_listStatus = "listed";
+        const job_listType = "listed";
+        const job_listStatus = "active";
         const claimedAt = null;
         const job_id = CreateJobId();
         const job_driver_id = null;
