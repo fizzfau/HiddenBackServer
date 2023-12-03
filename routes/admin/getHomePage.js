@@ -7,7 +7,7 @@ const { GetDrivers } = require('../../modules/socket/activeDrivers');
 
 router.get("/getHomePageData", authenticate, function(req, res) {
     const coopId = req.user.coopId;
-    User.find({ coopId: coopId }).exec()
+    User.find({ coopId: coopId, confirmed: true }).exec()
     .then(users => {
         if (!users) {
             return res.status(404).send({ message: "User Not found." });
