@@ -9,6 +9,7 @@ const UserSchema = Schema({
     coopId: String,
     lastClaimedJob: String,
     lastClaimedDate: Date,
+    confirmed: { type: Boolean, default: false },
     lastEntered: { type: Date, default: Date.now },
     date: { type: Date, default: Date.now }
 });

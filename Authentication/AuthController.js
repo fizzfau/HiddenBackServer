@@ -15,8 +15,8 @@ const register = async (req, res) => {
             plate: req.body.plate
         }).exec().then(user => {
             if (user.length >= 1) {
-                return res.status(409).json({
-                    message: "Phone number already exists"
+                return res.status(200).json({
+                    message: "Plaka zaten kayıtlı!"
                 });
             } else {
                 let user = new User({
@@ -78,7 +78,7 @@ const login = async (req, res) => {
                             name: user[0].name,
                             userId: user[0].userId,
                             plate: user[0].plate,
-                            coopId: user[0].coopId
+                            coopId: user[0].coopId   
                         },
                     });
                 } else {
