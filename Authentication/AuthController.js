@@ -4,39 +4,40 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 const register = async (req, res) => {
-    bcrypt.hash(req.body.password, 10, async (err, hashedPass) => {
-        if (err) {
-            res.json({
-                error: err
-            })
-        }
-        const userId = await createUniqueID();
-        User.find({
-            plate: req.body.plate
-        }).exec().then(user => {
-            if (user.length >= 1) {
-                return res.status(200).json({
-                    message: "Plaka zaten kayıtlı!"
-                });
-            } else {
-                let user = new User({
-                    name: req.body.name,
-                    plate: req.body.plate,
-                    coopId: req.body.coopId,
-                    userId: userId,
-                    password: hashedPass
-                })
-                try {
-                    const savedUser = user.save();
-                    res.json(savedUser);
-                } catch (err) {
-                    res.json({
-                        message: err
-                    })
-                }
-            }
-        })
-    })
+    console.log(12, req.body)
+    // bcrypt.hash(req.body.password, 10, async (err, hashedPass) => {
+    //     if (err) {
+    //         res.json({
+    //             error: err
+    //         })
+    //     }
+    //     const userId = await createUniqueID();
+    //     User.find({
+    //         plate: req.body.plate
+    //     }).exec().then(user => {
+    //         if (user.length >= 1) {
+    //             return res.status(200).json({
+    //                 message: "Plaka zaten kayıtlı!"
+    //             });
+    //         } else {
+    //             let user = new User({
+    //                 name: req.body.name,
+    //                 plate: req.body.plate,
+    //                 coopId: req.body.coopId,
+    //                 userId: userId,
+    //                 password: hashedPass
+    //             })
+    //             try {
+    //                 const savedUser = user.save();
+    //                 res.json(savedUser);
+    //             } catch (err) {
+    //                 res.json({
+    //                     message: err
+    //                 })
+    //             }
+    //         }
+    //     })
+    // })
 }
 
 const login = async (req, res) => {
