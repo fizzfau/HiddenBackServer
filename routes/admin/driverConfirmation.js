@@ -36,6 +36,7 @@ router.post("/declineDriver", authenticate, function(req, res) {
     if (!isAdmin) {
         return res.status(200).send({ success: false, message: "Yetkisiz işlem!" });
     }
+    console.log(39, req.body);
     User.findOneAndDelete({ coopId: coopId, userId: userId }).exec()
     .then(user => {
         res.status(200).send({ success: true, user });

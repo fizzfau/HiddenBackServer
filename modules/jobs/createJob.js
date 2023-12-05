@@ -8,7 +8,6 @@ const router = express.Router();
 
 router.post('/createJob', authenticate, (req, res) => {
     const {isAdmin, coopId} = req.user;
-    console.log(10, isAdmin, coopId);
     if (isAdmin) {
         const job_details = JSON.stringify(req.body);
         const job_coop_id = coopId;

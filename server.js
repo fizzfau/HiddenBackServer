@@ -11,9 +11,10 @@ const db = mongoose.connection;
 const RegisterRoute = require('./routes/auth');
 const Delete = require('./routes/deleteAccount');
 const GetDriverData = require('./routes/drivers/getDriverData');
+const DeleteDriver = require('./routes/drivers/deleteAccount');
 const GetJobs = require('./modules/jobs/getJobs');
 const AdminRoutes = require('./routes/admin/adminRoutes');
-const Queue = require('./modules/socket/getDriverQueue');
+const {Queue} = require('./modules/socket/getDriverQueue');
 const resetJobs = require('./modules/jobs/resetJobs');
 const { GetDrivers } = require('./modules/socket/activeDrivers');
 
@@ -24,6 +25,7 @@ const Routes = [
     GetJobs,
     Queue,
     resetJobs,
+    DeleteDriver
 ];
 
 db.on('error', (err) => {
@@ -65,7 +67,7 @@ app.get('/', (req, res) => {
 });
 
 app.post("/createAdmin", function(req, res) {
-    console.log(30, req.body);
+    // console.log(30, req.body);
     // const password = req.params.password;
     // const hashedPassword = bcrypt.hashSync(password, 8);
     // const userName = req.params.userName;

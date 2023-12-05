@@ -1,6 +1,4 @@
 const User = require('../../models/User');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const router = require('express').Router();
 const authenticate = require('../../middleware/authenticate');
 const { GetDrivers } = require('../../modules/socket/activeDrivers');
@@ -17,16 +15,30 @@ router.get("/getHomePageData", authenticate, function(req, res) {
     })
 });
 
-router.get("/navbar/:coopId", authenticate, function(req, res) {
+router.get("/navbar/:coopId", authenticate, async function(req, res) {
     const coopId = req.params.coopId;
     const isAdmin = req.user.isAdmin;
 
     if (!isAdmin) {
         return res.status(401).send({ success: false, message: "Yetkisiz işlem!" });
     }
+    const pendingCount = await GetDriverCount(coopId, true);
+    const driverCount = await GetDriverCount(coopId, false);
+
     res.json({
         activeUserCount: GetDrivers(coopId),
+        pendingCount,
+        driverCount
     });   
 })
+
+function GetDriverCount(coopId, pending) {
+    return new Promise((resolve, reject) => {
+        User.find({ coopId: coopId, confirmed: !pending }).exec()
+        .then(users => {
+            resolve(users.length);
+        })
+    })
+}
 
 module.exports = router;

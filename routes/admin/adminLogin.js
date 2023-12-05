@@ -28,8 +28,6 @@ router.get("/login/:username/:coopId/:password", function(req, res) {
                 expiresIn: 86400, // expires in 24 hours
             });
 
-            console.log(30, user, coop);
-
             res.status(200).send({ auth: true, token, user, coop });
         })
         .catch(err => {

@@ -4,18 +4,25 @@ const User = require('../../models/User');
 const { socket, getIo } = require('./connect');
 
 let queue = [];
+let queueIndex = 0;
+let currentUser = {
+    user: queue[queueIndex],
+    time: new Date().getTime(),
+};
 
 Cooperative.findOne({cooperativeId: "12345"}).exec().then(cooperative => {
     queue = JSON.parse(cooperative.coopDriverQueue);
-    currentUser = queue[0];
+    currentUser = {
+        user: queue[0],
+        time: new Date().getTime(),
+    };
     StartQueue();
 });
 
 const express = require('express');
 const router = express.Router();
 const authenticate = require('../../middleware/authenticate');
-let queueIndex = 0;
-let currentUser = null;
+
 
 function StartQueue() {
     const io = getIo()
@@ -27,9 +34,12 @@ function StartQueue() {
                     queueIndex = 0;
                 }
             }
-            currentUser = queue[queueIndex];
+            currentUser = {
+                user: queue[queueIndex],
+                time: new Date().getTime(),
+            };
             if (io) {
-                io.emit('queueInfo', {currentUser, queueIndex});
+                io.emit('queueInfo', {currentUser: currentUser.user, queueIndex, timeDiff: 0});
             }
         }
     }, 30000);
@@ -43,9 +53,27 @@ router.post('/takeJob', authenticate, (req, res) => {
     } else {
         res.status(200).json({
             success: false,
-            message: 'Sıradaki kullanıcı değilsiniz.!',
+            message: 'Sıradaki kullanıcı değilsiniz!',
         })
     }
+});
+
+router.get('/getMyQueueIndex', authenticate, (req, res) => {
+    const plate = req.user.plate;
+    console.log(53, plate);
+    for (let i = 0; i < queue.length; i++) {
+        if (queue[i].plate == plate) {
+            console.log(57, i);
+            res.status(200).json({
+                success: true,
+                index: i
+            })
+        }
+    }
+    res.status(200).json({
+        success: false,
+        index: -1
+    }) 
 });
 
 function takeJob(req, res) {
@@ -113,4 +141,18 @@ router.get('/getCurrentQueue', (req, res) => {
     res.send(currentUser);
 });
 
-module.exports = router;
+function getCurrentQueue() {
+    console.log(131, currentUser);
+    return currentUser;
+}
+
+function getQueueIndex() {
+    return queueIndex;
+}
+
+const Queue = router;
+module.exports = {
+    Queue,
+    getCurrentQueue,
+    getQueueIndex
+}

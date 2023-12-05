@@ -6,6 +6,7 @@ function SocketModule(server) {
     const jwt = require('jsonwebtoken');
     const User = require('../../models/User');
     const StartQueue = require('./getDriverQueue');
+    const {getCurrentQueue, getQueueIndex} = require('./getDriverQueue');
 
     io.on("connecting", (socket) => {
         console.log('a user tryin to connect');
@@ -18,6 +19,11 @@ function SocketModule(server) {
         const coopId = jwt.verify(token, process.env.SECRET).coopId;
         const userId = jwt.verify(token, process.env.SECRET).userId;
         IncrementDriver(coopId);
+        const current = getCurrentQueue();
+        if (current.user) {
+            const timeDiff = Math.floor((new Date().getTime() - current.time) / 1000)
+            socket.emit("queueInfo", {currentUser: current.user, queueIndex: getQueueIndex(), timeDiff});
+        }
 
         socket.on('disconnect', () => {
             DecrementDriver(coopId);
