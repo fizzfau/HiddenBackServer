@@ -29,7 +29,7 @@ function StartQueue() {
             }
             currentUser = queue[queueIndex];
             if (io) {
-                io.emit('queueInfo', currentUser);
+                io.emit('queueInfo', {currentUser, queueIndex});
             }
         }
     }, 30000);
