@@ -17,4 +17,16 @@ router.get("/getHomePageData", authenticate, function(req, res) {
     })
 });
 
+router.get("/navbar/:coopId", authenticate, function(req, res) {
+    const coopId = req.params.coopId;
+    const isAdmin = req.user.isAdmin;
+
+    if (!isAdmin) {
+        return res.status(401).send({ success: false, message: "Yetkisiz işlem!" });
+    }
+    res.json({
+        activeUserCount: GetDrivers(coopId),
+    });   
+})
+
 module.exports = router;

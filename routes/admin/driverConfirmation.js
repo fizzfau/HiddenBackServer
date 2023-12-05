@@ -23,7 +23,7 @@ router.post("/confirmDriver", authenticate, function(req, res) {
     }
     User.findOneAndUpdate({ coopId: coopId, userId: userId }, { confirmed: true }).exec()
     .then(user => {
-        res.status(200).send({ success: true, user });
+        res.status(200).send({ success: true });
     }).catch(err => {
         res.status(200).send({ success: false, message: err.message });
     })

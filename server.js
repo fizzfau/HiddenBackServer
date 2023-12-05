@@ -15,7 +15,7 @@ const GetJobs = require('./modules/jobs/getJobs');
 const AdminRoutes = require('./routes/admin/adminRoutes');
 const Queue = require('./modules/socket/getDriverQueue');
 const resetJobs = require('./modules/jobs/resetJobs');
-const createJob = require('./modules/jobs/createJob');
+const { GetDrivers } = require('./modules/socket/activeDrivers');
 
 const Routes = [
     RegisterRoute,
@@ -26,11 +26,9 @@ const Routes = [
     resetJobs,
 ];
 
-
 db.on('error', (err) => {
     console.log(`Database error: ${err}`);
 });
-
 
 const app = express();
 const http = require('http').createServer(app);
@@ -63,9 +61,7 @@ app.use('/admin', AdminRoutes)
 
 
 app.get('/', (req, res) => {
-    const { GetDrivers } = require('./modules/socket/activeDrivers');
-    console.log(GetDrivers("12345"));
-    res.json(GetDrivers("12345"));
+    console.log("Talha Haşim Osmanoğlu ve Eren Yalçın tarafından geliştirilmiştir.");
 });
 
 app.post("/createAdmin", function(req, res) {
