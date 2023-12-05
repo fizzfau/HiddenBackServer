@@ -25,7 +25,7 @@ router.post("/confirmDriver", authenticate, function(req, res) {
     User.findOneAndUpdate({ coopId: coopId, userId: userId }, { confirmed: true }).exec()
     .then(user => {
         // add user to coopDriverQueue
-        Cooperative.findOne({ coopId: coopId }).exec()
+        Cooperative.findOne({ cooperativeId: coopId }).exec()
         .then(coop => {
             let queue = JSON.parse(coop.coopDriverQueue);
             queue.push(user.userId);
