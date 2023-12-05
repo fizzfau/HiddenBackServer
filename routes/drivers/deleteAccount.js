@@ -48,4 +48,5 @@ router.delete('/deleteAccount', authenticate, (req, res) => {
     })
 });
 
+
 module.exports = router;
