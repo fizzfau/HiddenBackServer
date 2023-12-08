@@ -24,7 +24,7 @@ router.get("/login/:username/:coopId/:password", function(req, res) {
 
         Cooperative.findOne({ cooperativeId: coopId }).exec()
         .then(coop => {
-            const token = jwt.sign({ coopId, isAdmin: true, userName}, process.env.SECRET, {
+            const token = jwt.sign({ coopId, isAdmin: true, userName, name: user.name}, process.env.SECRET, {
                 expiresIn: 86400, // expires in 24 hours
             });
 

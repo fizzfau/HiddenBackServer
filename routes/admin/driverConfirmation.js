@@ -52,6 +52,14 @@ router.post("/declineDriver", authenticate, function(req, res) {
     console.log(39, req.body);
     User.findOneAndDelete({ coopId: coopId, userId: userId }).exec()
     .then(user => {
+        AddLog({
+            userName: req.user.name,
+            coopId: req.user.coopId,
+            action: "declineDriver",
+            logType: "success",
+            logDetails: JSON.stringify(user),
+            logText: `Kullanıcı reddedildi: ${user.userName}`,
+        });
         res.status(200).send({ success: true, user });
     })
 });
