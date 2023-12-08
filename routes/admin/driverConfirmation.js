@@ -2,6 +2,7 @@ const User = require('../../models/User');
 const router = require('express').Router();
 const authenticate = require('../../middleware/authenticate');
 const Cooperative = require('../../models/Cooperative');
+const { AddLog } = require('./logs');
 
 router.get("/getUnconfirmedDrivers", authenticate, function(req, res) {
     const coopId = req.user.coopId;
@@ -31,6 +32,14 @@ router.post("/confirmDriver", authenticate, function(req, res) {
             queue.push(user.userId);
             Cooperative.findOneAndUpdate({ coopId: coopId }, { coopDriverQueue: JSON.stringify(queue) }).exec()
             .then(() => {
+                AddLog({
+                    userName: req.user.name,
+                    coopId: req.user.coopId,
+                    action: "confirmDriver",
+                    logType: "success",
+                    logDetails: JSON.stringify(user),
+                    logText: `Kullanıcı onaylandı: ${user.userName}`,
+                });
                 res.status(200).send({ success: true, user });
             })
         })
@@ -50,6 +59,14 @@ router.post("/declineDriver", authenticate, function(req, res) {
     console.log(39, req.body);
     User.findOneAndDelete({ coopId: coopId, userId: userId }).exec()
     .then(user => {
+        AddLog({
+            userName: req.user.name,
+            coopId: req.user.coopId,
+            action: "declineDriver",
+            logType: "success",
+            logDetails: JSON.stringify(user),
+            logText: `Kullanıcı reddedildi: ${user.userName}`,
+        });
         res.status(200).send({ success: true, user });
     })
 });
