@@ -3,6 +3,7 @@ const router = require('express').Router();
 const authenticate = require('../../middleware/authenticate');
 const Cooperative = require('../../models/Cooperative');
 const {AddUserToQueue} = require('../../modules/socket/getDriverQueue');
+const {AddLog} = require('./logs');
 
 router.get("/getUnconfirmedDrivers", authenticate, function(req, res) {
     const coopId = req.user.coopId;
@@ -35,6 +36,16 @@ router.post("/confirmDriver", authenticate, function(req, res) {
                 plate: user.plate,
             });
             Cooperative.findOneAndUpdate({ cooperativeId: coopId }, { coopDriverQueue: JSON.stringify(queue) }).exec()
+            .then(() => {
+                AddLog({
+                    userName: req.user.name,
+                    coopId: req.user.coopId,
+                    action: "confirmDriver",
+                    logType: "success",
+                    logDetails: JSON.stringify(user),
+                    logText: `Kullanıcı onaylandı: ${user.userName}`,
+                });
+            })
         })
         res.status(200).send({ success: true });
     }).catch(err => {
