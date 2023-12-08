@@ -10,19 +10,61 @@ let currentUser = {
     time: new Date().getTime(),
 };
 
+function AddUserToQueue(userData) {
+    queue.push(userData);
+}
+
+function RemoveFromQueue(plate) {
+    if (currentUser.user.plate == plate) {
+        queueIndex++;
+        if (queueIndex >= queue.length) {
+            queueIndex = 0;
+        }
+        currentUser = {
+            user: queue[queueIndex],
+            time: new Date().getTime(),
+        };
+        const io = getIo();
+        io.emit('queueInfo', {currentUser: currentUser.user, queueIndex, timeDiff: 0});
+    }
+    for (let i = 0; i < queue.length; i++) {
+        console.log(19, plate, queue[i].plate);
+        if (queue[i].plate == plate) {
+            queue.splice(i, 1);
+            break;
+        }
+    }
+}
+    
+
+
 Cooperative.findOne({cooperativeId: "12345"}).exec().then(cooperative => {
-    queue = JSON.parse(cooperative.coopDriverQueue);
-    currentUser = {
-        user: queue[0],
-        time: new Date().getTime(),
-    };
-    StartQueue();
+    const unDetailed = JSON.parse(cooperative.coopDriverQueue);
+    for (i in unDetailed) {
+        console.log(11, i, unDetailed[i]);
+        User.findOne({userId: unDetailed[i]}).exec().then(user => {
+            if (user) {
+                queue.push({
+                    name: user.name,
+                    plate: user.plate,
+                });
+            }
+        })
+    }
+    setTimeout(() => {
+        currentUser = {
+            user: queue[0],
+            time: new Date().getTime(),
+        };
+        console.log(22, queue);
+        StartQueue();
+    }, 1000);
 });
 
 const express = require('express');
 const router = express.Router();
 const authenticate = require('../../middleware/authenticate');
-
+const { set } = require('mongoose');
 
 function StartQueue() {
     const io = getIo()
@@ -39,7 +81,7 @@ function StartQueue() {
                 time: new Date().getTime(),
             };
             if (io) {
-                io.emit('queueInfo', {currentUser: currentUser.user, queueIndex, timeDiff: 0});
+                io.emit('queueInfo', {currentUser: currentUser.user, queueIndex, timeDiff: 0, queueLen: queue.length});
             }
         }
     }, 30000);
@@ -60,19 +102,21 @@ router.post('/takeJob', authenticate, (req, res) => {
 
 router.get('/getMyQueueIndex', authenticate, (req, res) => {
     const plate = req.user.plate;
-    console.log(53, plate);
     for (let i = 0; i < queue.length; i++) {
         if (queue[i].plate == plate) {
             console.log(57, i);
             res.status(200).json({
                 success: true,
-                index: i
+                index: i,
+                queueLen: queue.length,
             })
+            return
         }
     }
     res.status(200).json({
         success: false,
-        index: -1
+        index: -1,
+        queueLen: queue.length,
     }) 
 });
 
@@ -142,7 +186,6 @@ router.get('/getCurrentQueue', (req, res) => {
 });
 
 function getCurrentQueue() {
-    console.log(131, currentUser);
     return currentUser;
 }
 
@@ -150,9 +193,16 @@ function getQueueIndex() {
     return queueIndex;
 }
 
+function getQueueLen() {
+    return queue.length;
+}
+
 const Queue = router;
 module.exports = {
     Queue,
     getCurrentQueue,
-    getQueueIndex
+    getQueueIndex,
+    AddUserToQueue,
+    RemoveFromQueue,
+    getQueueLen
 }

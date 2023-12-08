@@ -2,6 +2,7 @@ const User = require('../../models/User');
 const router = require('express').Router();
 const authenticate = require('../../middleware/authenticate');
 const Cooperative = require('../../models/Cooperative');
+const {AddUserToQueue} = require('../../modules/socket/getDriverQueue');
 
 router.get("/getUnconfirmedDrivers", authenticate, function(req, res) {
     const coopId = req.user.coopId;
@@ -29,10 +30,11 @@ router.post("/confirmDriver", authenticate, function(req, res) {
         .then(coop => {
             let queue = JSON.parse(coop.coopDriverQueue);
             queue.push(user.userId);
-            Cooperative.findOneAndUpdate({ coopId: coopId }, { coopDriverQueue: JSON.stringify(queue) }).exec()
-            .then(() => {
-                res.status(200).send({ success: true, user });
-            })
+            AddUserToQueue({
+                name: user.name,
+                plate: user.plate,
+            });
+            Cooperative.findOneAndUpdate({ cooperativeId: coopId }, { coopDriverQueue: JSON.stringify(queue) }).exec()
         })
         res.status(200).send({ success: true });
     }).catch(err => {

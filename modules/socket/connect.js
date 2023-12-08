@@ -6,7 +6,7 @@ function SocketModule(server) {
     const jwt = require('jsonwebtoken');
     const User = require('../../models/User');
     const StartQueue = require('./getDriverQueue');
-    const {getCurrentQueue, getQueueIndex} = require('./getDriverQueue');
+    const {getCurrentQueue, getQueueIndex, getQueueLen} = require('./getDriverQueue');
 
     io.on("connecting", (socket) => {
         console.log('a user tryin to connect');
@@ -22,7 +22,8 @@ function SocketModule(server) {
         const current = getCurrentQueue();
         if (current.user) {
             const timeDiff = Math.floor((new Date().getTime() - current.time) / 1000)
-            socket.emit("queueInfo", {currentUser: current.user, queueIndex: getQueueIndex(), timeDiff});
+            const queueLen = getQueueLen();
+            socket.emit("queueInfo", {currentUser: current.user, queueIndex: getQueueIndex(), timeDiff, queueLen});
         }
 
         socket.on('disconnect', () => {
