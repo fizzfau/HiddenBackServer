@@ -8,7 +8,6 @@ router.get('/getDriverData', authenticate, (req, res) => {
     User.findOne({userId: req.user.userId})
     .exec()
     .then(user => {
-        console.log(11, user, typeof user.userId)
         Jobs.find({job_driver_id: user.userId})
         .exec()
         .then(jobs => {

@@ -43,7 +43,7 @@ Cooperative.findOne({cooperativeId: "12345"}).exec().then(cooperative => {
                 queue.push({
                     name: user.name,
                     plate: user.plate,
-                    userId: unDetailed[i]
+                    userId: user.userId
                 });
             }
         })
@@ -79,7 +79,7 @@ function StartQueue() {
                 io.emit('queueInfo', {currentUser: currentUser.user, queueIndex, timeDiff: 0, queueLen: queue.length});
             }
         }
-    }, 30000);
+    }, 3000);
 }
 
 // Etkileşimde bulunma endpoint'i
@@ -139,8 +139,8 @@ function takeJob(req, res) {
                 })
             }
 
-            job.job_listStatus = 'claimed';
-            job.job_driver_id = driverId;
+            // job.job_listStatus = 'claimed';
+            // job.job_driver_id = driverId;
             job.claimedAt = Date.now();
 
             job.save();
@@ -151,9 +151,12 @@ function takeJob(req, res) {
                 lastClaimedJob: id,
                 lastClaimedDate: Date.now()
             }).exec()
-            
-            queue.push(currentUser);
+            console.log(154, queue)
+            console.log(155, currentUser)
+            queue.push({name: currentUser.user.name, plate: currentUser.user.plate, userId: currentUser.user.userId});
             queue.splice(queueIndex, 1);
+
+            console.log(159, queue)
 
             const driverIds = ReturnDriverIdsAsList()
             console.log('driverIds', driverIds)
@@ -199,6 +202,7 @@ function getQueueLen() {
 function ReturnDriverIdsAsList() {
     let queueIds = []
     for (i = 0; i < queue.length; i++) {
+        console.log(202, queue[i])
         if (queue[i]) {
             queueIds.push(queue[i].userId)
         }
