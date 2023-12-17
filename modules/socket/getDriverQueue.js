@@ -154,6 +154,9 @@ function takeJob(req, res) {
             
             queue.push(currentUser);
             queue.splice(queueIndex, 1);
+
+            const driverIds = ReturnDriverIdsAsList()
+            console.log('driverIds', driverIds)
             
             Cooperative.findOneAndUpdate({
                 cooperativeId: req.user.coopId
