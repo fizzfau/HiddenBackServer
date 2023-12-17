@@ -1,17 +1,9 @@
 const router = require('express').Router();
 const authenticate = require('../../middleware/authenticate');
+const LogModel = require('../../models/Logs')
 
 function AddLog(logData) {
-    const newLog = new Logs({
-        userName: logData.userName,
-        coopId: logData.coopId,
-        action: logData.action,
-        logType: logData.logType,
-        logDetails: logData.logDetails,
-        logText: logData.logText,
-    });
-
-    newLog.save();
+    new LogModel(logData).save();
 }
 
 router.get('/getLogs', authenticate, function (req, res) {
@@ -20,7 +12,7 @@ router.get('/getLogs', authenticate, function (req, res) {
     if (!isAdmin) {
         return res.status(200).send({ success: false, message: 'Yetkisiz işlem!' });
     }
-    Logs.find({ coopId: coopId }).exec()
+    LogModel.find({ coopId: coopId }).exec()
         .then(logs => {
             res.status(200).send({ success: true, logs });
         })

@@ -13,7 +13,7 @@ let currentUser = {
 function AddUserToQueue(userData) {
     queue.push(userData);
 }
-
+//
 function RemoveFromQueue(plate) {
     if (currentUser.user.plate == plate) {
         queueIndex++;
@@ -47,6 +47,7 @@ Cooperative.findOne({cooperativeId: "12345"}).exec().then(cooperative => {
                 queue.push({
                     name: user.name,
                     plate: user.plate,
+                    userId: unDetailed[i]
                 });
             }
         })
@@ -90,7 +91,7 @@ function StartQueue() {
 // Etkileşimde bulunma endpoint'i
 router.post('/takeJob', authenticate, (req, res) => {
     const plate = req.user.plate;
-    if (currentUser.plate == plate) {
+    if (currentUser.user.plate == plate) {
         takeJob(req, res);
     } else {
         res.status(200).json({
@@ -123,7 +124,7 @@ router.get('/getMyQueueIndex', authenticate, (req, res) => {
 function takeJob(req, res) {
     const id = req.body.id;
     const driverId = req.user.userId;
-
+    console.log(127, id, driverId)
     Jobs.findOne({
         job_id: id,
         job_coop_id: req.user.coopId,
@@ -136,6 +137,7 @@ function takeJob(req, res) {
                     message: 'Böyle bir iş bulunamadı!'
                 })
             }
+            console.log(140, job)
             if (job.job_listStatus === 'claimed') {
                 return res.status(200).json({
                     success: false,
@@ -147,6 +149,8 @@ function takeJob(req, res) {
             job.job_driver_id = driverId;
             job.claimedAt = Date.now();
 
+            console.log(152, job.claimedAt)
+
             job.save();
 
             User.findOneAndUpdate({
@@ -156,14 +160,23 @@ function takeJob(req, res) {
                 lastClaimedDate: Date.now()
             }).exec()
             
+            console.log(163, queue)
+
             queue.push(currentUser);
             queue.splice(queueIndex, 1);
+            
+            console.log(167)
+            console.log(ReturnDriverIdsAsList())
 
-            Cooperative.findOneAndUpdate({
-                cooperativeId: req.user.coopId
-            }, {
-                coopDriverQueue: JSON.stringify(queue)
-            }).exec()
+            // console.log(168, ReturnDriverIdsAsList(queue))
+
+            // Cooperative.findOneAndUpdate({
+            //     cooperativeId: req.user.coopId
+            // }, {
+            //     coopDriverQueue: JSON.stringify(ReturnDriverIdsAsList(queue))
+            // }).exec()
+
+            console.log(173, "save")
 
             res.status(200).json({
                 success: true,
@@ -185,6 +198,11 @@ router.get('/getCurrentQueue', (req, res) => {
     res.send(currentUser);
 });
 
+router.get('/getdriverids', function(req, res){
+    console.log(202, ReturnDriverIdsAsList())
+    res.send("test")
+})
+
 function getCurrentQueue() {
     return currentUser;
 }
@@ -196,6 +214,22 @@ function getQueueIndex() {
 function getQueueLen() {
     return queue.length;
 }
+
+function ReturnDriverIdsAsList() {
+    let queueIds = []
+    console.log(220, queue)
+    for (i = 0; queue.length; i++) {
+        if (queue[i]) {
+            console.log(31, queue[i])
+            queueIds.push(queue[i].userId)
+        }
+    }
+    console.log(227)
+    // console.log(226, queueIds)
+    return queueIds
+}
+
+
 
 const Queue = router;
 module.exports = {

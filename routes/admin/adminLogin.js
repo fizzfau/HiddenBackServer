@@ -20,8 +20,6 @@ router.get("/login/:username/:coopId/:password", function(req, res) {
             return res.status(200).send({ auth: false });
         }
         
-        
-
         Cooperative.findOne({ cooperativeId: coopId }).exec()
         .then(coop => {
             const token = jwt.sign({ coopId, isAdmin: true, userName, name: user.name}, process.env.SECRET, {

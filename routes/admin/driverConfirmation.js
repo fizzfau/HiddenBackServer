@@ -5,13 +5,19 @@ const Cooperative = require('../../models/Cooperative');
 const {AddUserToQueue} = require('../../modules/socket/getDriverQueue');
 const {AddLog} = require('./logs');
 
-router.get("/getUnconfirmedDrivers", authenticate, function(req, res) {
+router.post("/getUnconfirmedDrivers", authenticate, function(req, res) {
     const coopId = req.user.coopId;
     const isAdmin = req.user.isAdmin;
     if (!isAdmin) {
         return res.status(200).send({ success: false, message: "Yetkisiz işlem!" });
     }
-    User.find({ coopId: coopId, confirmed: false }).exec()
+    const searchFilter = req.body.search
+    const query = !searchFilter ? { coopId: coopId, confirmed: false } :
+    { coopId: coopId, confirmed: false, $or: [
+        {plate: { $regex: new RegExp(searchFilter, 'i') }}, 
+        {name: { $regex: new RegExp(searchFilter, 'i') }}
+    ] }
+    User.find(query).exec()
     .then(users => {
         res.status(200).send({ uccess: true, users });
     })
@@ -37,13 +43,21 @@ router.post("/confirmDriver", authenticate, function(req, res) {
             });
             Cooperative.findOneAndUpdate({ cooperativeId: coopId }, { coopDriverQueue: JSON.stringify(queue) }).exec()
             .then(() => {
-                AddLog({
+                console.log(40, {
                     userName: req.user.name,
-                    coopId: req.user.coopId,
+                    coopId: coopId,
                     action: "confirmDriver",
                     logType: "success",
-                    logDetails: JSON.stringify(user),
-                    logText: `Kullanıcı onaylandı: ${user.userName}`,
+                    logDetails: JSON.stringify({}),
+                    logText: `Kullanıcı onaylandı: ${user.name} - ${user.plate}`,
+                });
+                AddLog({
+                    userName: req.user.name,
+                    coopId: coopId,
+                    action: "confirmDriver",
+                    logType: "success",
+                    logDetails: JSON.stringify({}),
+                    logText: `<strong> ${user.name} - ${user.plate} </strong> kullanıcısı onaylandı.`,
                 });
             })
         })
@@ -60,16 +74,16 @@ router.post("/declineDriver", authenticate, function(req, res) {
     if (!isAdmin) {
         return res.status(200).send({ success: false, message: "Yetkisiz işlem!" });
     }
-    console.log(39, req.body);
+
     User.findOneAndDelete({ coopId: coopId, userId: userId }).exec()
     .then(user => {
         AddLog({
             userName: req.user.name,
-            coopId: req.user.coopId,
+            coopId: coopId,
             action: "declineDriver",
             logType: "success",
-            logDetails: JSON.stringify(user),
-            logText: `Kullanıcı reddedildi: ${user.userName}`,
+            logDetails: JSON.stringify({}),
+            logText: `<strong> ${user.name} - ${user.plate} </strong> kullanıcısı reddedildi.`,
         });
         res.status(200).send({ success: true, user });
     })
