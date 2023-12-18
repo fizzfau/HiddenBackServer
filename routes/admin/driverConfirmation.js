@@ -8,6 +8,9 @@ const {AddLog} = require('./logs');
 router.post("/getUnconfirmedDrivers", authenticate, function(req, res) {
     const coopId = req.user.coopId;
     const isAdmin = req.user.isAdmin;
+    const page = req.body.page;
+    const startIndex = page && (page == 1 ? 1 : (page - 1) * 10);
+    const endIndex = page && (page == 1 ? 10 : page * 10);
     if (!isAdmin) {
         return res.status(200).send({ success: false, message: "Yetkisiz işlem!" });
     }
@@ -17,10 +20,11 @@ router.post("/getUnconfirmedDrivers", authenticate, function(req, res) {
         {plate: { $regex: new RegExp(searchFilter, 'i') }}, 
         {name: { $regex: new RegExp(searchFilter, 'i') }}
     ] }
+
     User.find(query).exec()
-    .then(users => {
-        res.status(200).send({ uccess: true, users });
-    })
+        .then(users => {
+            res.status(200).send({ success: true, users: !searchFilter ? users.slice(startIndex, endIndex) : users, totalCount: users.length });
+        })
 });
 
 router.post("/confirmDriver", authenticate, function(req, res) {
@@ -89,5 +93,23 @@ router.post("/declineDriver", authenticate, function(req, res) {
         res.status(200).send({ success: true, user });
     })
 });
+
+// router.get('/createFakeDrivers', (req, res) => {
+//     const names = ["Ahmet", "Mehmet", "Ali", "Veli", "Ayşe", "Fatma", "Zeynep", "Merve", "Ece", "Ege", "Berk", "Bora", "Cem", "Can", "Deniz", "Doruk", "Ekin", "Elif", "Emir", "Emre", "Furkan", "Gökçe", "Gökhan"
+//     , "Güneş", "Hakan", "İbrahim", "İpek", "İrem", "Kerem", "Koray", "Mert", "Mete", "Nur", "Oğuz", "Ömer", "Özge", "Pınar", "Selin", "Sena", "Sude", "Sude", "Şeyma", "Taha", "Tolga", "Yiğit", "Yusuf", "Zeynep"]
+//     const plates = ["34", "35", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16"]
+//     const coopId = "12345"
+//     for (i = 0; i < 100; i++) {
+//         let user = new User({
+//             name: names[Math.floor(Math.random() * names.length)],
+//             plate: plates[Math.floor(Math.random() * plates.length)] + " " + Math.floor(Math.random() * 10000),
+//             coopId: coopId,
+//             userId: Math.floor(Math.random() * 100000000),
+//             password: "123456",
+//             confirmed: false
+//         })
+//         user.save();
+//     }
+// })
 
 module.exports = router;
