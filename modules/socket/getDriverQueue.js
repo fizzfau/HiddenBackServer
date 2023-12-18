@@ -99,7 +99,6 @@ router.get('/getMyQueueIndex', authenticate, (req, res) => {
     const plate = req.user.plate;
     for (let i = 0; i < queue.length; i++) {
         if (queue[i].plate == plate) {
-            console.log(57, i);
             res.status(200).json({
                 success: true,
                 index: i,
@@ -139,8 +138,8 @@ function takeJob(req, res) {
                 })
             }
 
-            // job.job_listStatus = 'claimed';
-            // job.job_driver_id = driverId;
+            job.job_listStatus = 'claimed';
+            job.job_driver_id = driverId;
             job.claimedAt = Date.now();
 
             job.save();
@@ -151,20 +150,13 @@ function takeJob(req, res) {
                 lastClaimedJob: id,
                 lastClaimedDate: Date.now()
             }).exec()
-            console.log(154, queue)
-            console.log(155, currentUser)
             queue.push({name: currentUser.user.name, plate: currentUser.user.plate, userId: currentUser.user.userId});
             queue.splice(queueIndex, 1);
-
-            console.log(159, queue)
-
-            const driverIds = ReturnDriverIdsAsList()
-            console.log('driverIds', driverIds)
-            
+            const driverIds = ReturnDriverIdsAsList()            
             Cooperative.findOneAndUpdate({
                 cooperativeId: req.user.coopId
             }, {
-                coopDriverQueue: JSON.stringify(ReturnDriverIdsAsList())
+                coopDriverQueue: JSON.stringify(driverIds)
             }).exec()
 
             res.status(200).json({
@@ -209,6 +201,16 @@ function ReturnDriverIdsAsList() {
     }
     return queueIds
 }
+
+router.get("/resetConfirmed", (req, res) => {
+    User.find({}).exec().then(users => {
+        for (i in users) {
+            users[i].confirmed = false;
+            users[i].save();
+        }
+        res.send("OK");
+    })
+})
 
 
 
